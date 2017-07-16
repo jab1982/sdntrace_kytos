@@ -127,14 +127,24 @@ class TraceManager(object):
             True: all set
             False: switch requested doesn't exist
         """
+        # Check if provided dpid relates to an existing switch
         dpid = entries['trace']['switch']['dpid']
         init_switch = Switches().get_switch(dpid)
         if isinstance(init_switch, bool):
-            return False
+            return False, {'error': 'DPID %s not found' % dpid}
+
+        # Check if the existing switch was colored
         color = Colors().get_switch_color(init_switch.dpid)
         if len(color) is 0:
-            return False
-        return True
+            return False, {'error': 'switch color not defined'}
+
+        # Check if dl_vlan was provided
+        try:
+            vlan = entries['trace']['eth']['dl_vlan']
+        except:
+            return False, {'error': 'dl_vlan is mandatory'}
+
+        return True, 0
 
     def get_id(self):
         """ID generator for each trace. Useful in case
@@ -177,13 +187,15 @@ class TraceManager(object):
         Returns:
             int with the request/trace id
         """
-        if not self.is_entry_valid(entries):
-            log.warning('Request with Invalid Switch Provided')
-            return 0
+        is_valid, msg = self.is_entry_valid(entries)
+        if not is_valid:
+            log.warning(msg)
+            return msg
 
         if self.verify_active_new_request(entries):
-            log.warn('Ignoring Duplicated Trace Request Received')
-            return 0
+            msg = 'Ignoring Duplicated Trace Request Received'
+            log.warn(msg)
+            return msg
 
         trace_id = self.get_id()
         # Add to active_trace queue:
@@ -246,10 +258,10 @@ class TraceManager(object):
         result = dict()
         entries = request.get_json()
         t_id = self.new_trace(entries)
-        if t_id is not 0:
+        if isinstance(t_id, int):
             result['result'] = {'trace_id': t_id}
         else:
-            result['result'] = {'Error': 'Invalid Switch'}
+            result['result'] = t_id
         return json.dumps(result)
 
     def rest_get_result(self, trace_id):

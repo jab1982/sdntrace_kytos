@@ -38,14 +38,12 @@ ovs-ofctl add-flow s4 "priority=2 dl_type=0x88cc actions=output:CONTROLLER"
 ovs-ofctl add-flow s1 "priority=30000 in_port=1 actions=mod_vlan_vid:101,output:2"
 ovs-ofctl add-flow s2 "priority=30000 in_port=2,dl_vlan=101 actions=mod_vlan_vid:102,output:3"
 ovs-ofctl add-flow s3 "priority=30000 in_port=2,dl_vlan=102 actions=mod_vlan_vid:103,output:3"
-#ovs-ofctl add-flow s4 "priority=30000 in_port=2,dl_vlan=103 actions=strip_vlan,output:1"
-ovs-ofctl add-flow s4 "priority=30000 in_port=2,dl_vlan=103 actions=output:1"
+ovs-ofctl add-flow s4 "priority=30000 in_port=2,dl_vlan=103 actions=strip_vlan,output:1"
 
 ovs-ofctl add-flow s4 "priority=30000 in_port=1 actions=mod_vlan_vid:295,output:2"
 ovs-ofctl add-flow s3 "priority=30000 in_port=3,dl_vlan=295 actions=mod_vlan_vid:296,output:2"
 ovs-ofctl add-flow s2 "priority=30000 in_port=3,dl_vlan=296 actions=mod_vlan_vid:297,output:2"
-ovs-ofctl add-flow s1 "priority=30000 in_port=2,dl_vlan=297 actions=output:1"
-#ovs-ofctl add-flow s1 "priority=30000 in_port=2,dl_vlan=297 actions=strip_vlan,output:1"
+ovs-ofctl add-flow s1 "priority=30000 in_port=2,dl_vlan=297 actions=strip_vlan,output:1"
 
 
 # Tests
